@@ -15,5 +15,5 @@
  */
 function latex2image($text)
 {
-	return 'http://chart.apis.google.com/chart?cht=tx&chl=' . urlencode($text);
+    return 'http://chart.apis.google.com/chart?cht=tx&chl=' . urlencode($text);
 }

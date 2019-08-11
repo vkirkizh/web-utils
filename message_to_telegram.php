@@ -18,7 +18,8 @@
  * @param string $token
  * @param string $chat_id
  */
-function message_to_telegram($text, $token, $chat_id) {
+function message_to_telegram($text, $token, $chat_id)
+{
 	$ch = curl_init();
 	curl_setopt_array(
 		$ch,

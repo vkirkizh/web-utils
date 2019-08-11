@@ -49,7 +49,6 @@
  * — Отменяет текущую транзакцию
  */
 
-
 define('DB_SKIP', log(0));
 
 class DB
@@ -72,7 +71,6 @@ class DB
 	protected $debug = false;
 	protected $time = 0;
 
-	// подключение к базе данных
 	public function __construct($set = null)
 	{
 		if ($set !== null) {
@@ -119,14 +117,12 @@ class DB
 
 	private function __clone() {}
 
-	// выборка двумерного массива
 	public function select($query)
 	{
 		$total = false;
 		return $this->_query(func_get_args(), $total);
 	}
 
-	// выборка двумерного массива с подсчётом общего кол-ва строк
 	public function selectPage(&$total, $query)
 	{
 		$args = func_get_args();
@@ -135,7 +131,6 @@ class DB
 		return $this->_query($args, $total);
 	}
 
-	// выборка однострочного результата запроса (одна строка)
 	public function selectRow($query)
 	{
 		$total = false;
@@ -145,7 +140,6 @@ class DB
 		return array_shift($res);
 	}
 
-	// выборка скалярного результата запроса (одна ячейка)
 	public function selectCell($query)
 	{
 		$total = false;
@@ -157,38 +151,32 @@ class DB
 		return array_shift($res);
 	}
 
-	// вызов не-SELECT запроса
 	public function query($query)
 	{
 		$total = false;
 		return $this->_query(func_get_args(), $total, true);
 	}
 
-	// запуск новой транзакции
 	public function transaction()
 	{
 		return @$this->link->begin_transaction();
 	}
 
-	// подтверждение транзакции
 	public function commit()
 	{
 		return @$this->link->commit();
 	}
 
-	// отмена транзакции
 	public function rollback()
 	{
 		return @$this->link->rollback();
 	}
 
-	// режим отладки запроса
 	public function debug()
 	{
 		$this->debug = true;
 	}
 
-	// выполнение запроса
 	protected function _query($query, &$total, $nonselect = false)
 	{
 		$query = $this->placeholders($query);
@@ -249,7 +237,6 @@ class DB
 		return $data;
 	}
 
-	// раскрытие плейсхолдеров
 	protected $placeholderArgs = array();
 	protected $placeholderNoValueFound = false;
 	protected function placeholders(&$queryAndArgs)
@@ -262,36 +249,36 @@ class DB
 	}
 	protected function placeholdersFlow($query)
 	{
-		 $re = '{
-			 (?>
-				 (?>
-					 -- [^\r\n]*
-				 )
-				   |
-				 (?>
+		$re = '{
+			(?>
+				(?>
+					-- [^\r\n]*
+				)
+					|
+				(?>
 					 "   (?> [^"\\\\]+|\\\\"|\\\\)*	   "     |
 					\'   (?> [^\'\\\\]+|\\\\\'|\\\\)* \'     |
 					 `   (?> [^`]+ | ``)*              `     |
 					 /\* .*? \*/
-				 )
-			 )
-				  |
-			 (?>
-				 \{
-					 ( (?> (?>[^{}]+)	|  (?R) )* )
-				 \}
-			 )
-				  |
-			 (?>
-				 (\?) ( [_dsafnblsx\#]? )
-			 )
-		 }sx';
-		 $query = preg_replace_callback(
-			 $re,
-			 array(&$this, 'placeholdersCallback'),
-			 $query
-		 );
-		 return $query;
+				)
+			)
+					|
+			(?>
+				\{
+					( (?> (?>[^{}]+)	|  (?R) )* )
+				\}
+			)
+					|
+			(?>
+				(\?) ( [_dsafnblsx\#]? )
+			)
+		}sx';
+		$query = preg_replace_callback(
+			$re,
+			array(&$this, 'placeholdersCallback'),
+			$query
+		);
+		return $query;
 	}
 	protected function placeholdersCallback($m)
 	{
@@ -378,7 +365,6 @@ class DB
 		return $m[0];
 	}
 
-	// экранирование значения
 	protected function escape($val, $flag = false)
 	{
 		$val = $this->link->real_escape_string((string)$val);
@@ -386,13 +372,11 @@ class DB
 		return $val;
 	}
 
-	// экранирование идентификатора
 	protected function ident($val)
 	{
 		return '`' . str_replace('`', '``', (string)$val) . '`';
 	}
 
-	// преобразование выборки
 	protected function transform($rows)
 	{
 		if (is_array($rows) && $rows) {
@@ -415,6 +399,7 @@ class DB
 		}
 		return $rows;
 	}
+
 	protected function transformToHash($rows, $arrayKeys)
 	{
 		$arrayKeys = (array)$arrayKeys;
@@ -437,6 +422,7 @@ class DB
 		}
 		return $result;
 	}
+
 	protected function transformToForest($rows, $idName, $pidName)
 	{
 		$children = array();
@@ -493,7 +479,6 @@ class DB_Exception extends Exception
 		foreach ($trace as &$a) unset($a['object']);
 
 		$seen = 0;
-		$smart = array();
 		for ($i = 0, $n = count($trace); $i < $n; $i++) {
 			$t = $trace[$i];
 			if (!$t) continue;
@@ -509,12 +494,11 @@ class DB_Exception extends Exception
 			if (++$seen < 2) continue;
 
 			if ($next) {
-				$caller = (isset($next['class'])? $next['class'].'::' : '') . (isset($next['function'])? $next['function'] : '');
+				$caller = (isset($next['class']) ? $next['class'] . '::' : '') . (isset($next['function']) ? $next['function'] : '');
 				if (preg_match("/^(?> DB::.* | DB_.*::.* | call_user_func.* )$/six", $caller)) continue;
 			}
 
 			return $t;
-			$smart[] = $t;
 		}
 
 		return false;
